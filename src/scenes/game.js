@@ -15,6 +15,10 @@ class Game extends Phaser.Scene {
   create() {
     // this.add.image(200, 300, 'penguin', "penguin_die03.png")
 
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    this.isTouchingGround = false;
+
     const map = this.make.tilemap({
       key: "tilemap"
     })
@@ -24,17 +28,15 @@ class Game extends Phaser.Scene {
     const tileset = map.addTilesetImage("icemap", "tiles")
 
     const ground = map.createLayer('ground', tileset);
-
     ground.setCollisionByProperty({ collides: true })
 
-    this.matter.world.convertTilemapLayer(ground)
+    const objectsLayer = map.getObjectLayer('objects')
+
 
     const { width, height } = this.scale;
 
-    this.coin = this.add.sprite(100, 700 / 2, "coin");
 
 
-    this.penguin = this.matter.add.sprite(500, 300 / 2, "penguin");
     this.monster = this.matter.add.sprite(width / 2, height / 2, "monster").setScale(0.2);
 
     // this.physics.matter.add.overlap(this.penguin, this.monster, () => { console.log() }, null, this);
@@ -43,7 +45,7 @@ class Game extends Phaser.Scene {
     // this.physics.add.collider(this.penguin, this.monster, function (sprite, body) {
     //   // Collision logic
     //   console.log('Collision occurred between sprite and Matter.js body');
-    // });
+    // });ump
 
 
 
@@ -112,7 +114,10 @@ class Game extends Phaser.Scene {
 
 
 
-    this.coin.anims.play('rotate-coin', true);
+
+
+
+
     this.anims.create({
       key: "walk",
       frames: this.anims.generateFrameNames("penguin", {
@@ -133,8 +138,9 @@ class Game extends Phaser.Scene {
         prefix: "penguin_jump0",
         suffix: ".png"
       }),
-      frameRate: 6,
-      repeat: -1,
+      frameRate: 10,
+      repeat: 0,
+      loop: true
     })
 
     this.anims.create({
@@ -153,38 +159,101 @@ class Game extends Phaser.Scene {
       key: "idle",
       frames: [{ key: "penguin", frame: "penguin_walk01.png" }],
     })
-    this.penguin.play('idle')
-    this.penguin.setFixedRotation();
 
-    this.cameras.main.startFollow(this.penguin)
+
+
+
+
+
+
+
+    objectsLayer.objects.forEach(objData => {
+      const { x = 0, y = 0, name, width = 0, height = 0 } = objData
+
+      this.penguin;
+
+      switch (name) {
+        case "penguin-spawn":
+          {
+            this.penguin = this.matter.add.sprite(x + width / 2, y, "penguin")
+              .play('idle')
+              .setFixedRotation()
+
+            this.penguin.setOnCollide(() => {
+              this.isTouchingGround = true;
+            })
+
+            this.cameras.main.startFollow(this.penguin)
+
+            break;
+          }
+
+        case "coin": {
+          this.coin = this.matter.add.sprite(x + width / 2, y + height / 2, "coin")
+            .setStatic(true);
+
+          this.coin.anims.play('rotate-coin', true);
+
+          this.matter.world.on("collisionstart", (event, bodyA, bodyB) => {
+            if ((bodyA.label == this.coin && bodyB.label == this.penguin) || (bodyB.label == this.coin && bodyA.label == this.penguin)) {
+              console.log('hitted')
+            }
+
+            // console.log('hitted')
+          });
+
+
+          // this.coin.setOnCollide(() => {
+          //   console.log('hi coin hit')
+          //   this.coin.destroy(true)
+          // })
+
+
+        }
+      }
+
+      console.log(objData)
+    })
+
+
+    this.matter.world.convertTilemapLayer(ground)
 
   }
 
-  update() {
-    let cursors = this.input.keyboard.createCursorKeys();
 
-    if (cursors.left.isDown) {
+  update() {
+
+
+    if (this.cursors.left.isDown) {
       this.penguin.setVelocityX(-6);
       this.penguin.flipX = true;
       this.penguin.anims.play('walk', true);
     }
-    else if (cursors.right.isDown) {
+    else if (this.cursors.right.isDown) {
       this.penguin.setVelocityX(6);
       this.penguin.flipX = false;
-      this.penguin.anims.play('slide', true);
-    }
-    else if (cursors.up.isDown) {
-
-      this.penguin.setVelocityY(-6);
-      this.penguin.flipX = false;
-      this.penguin.anims.play('jump', true);
-      // this.penguin.anims.play('walk', true);
+      this.penguin.anims.play('walk', true);
     }
     else {
       this.penguin.setVelocityX(0);
       this.penguin.anims.play('idle');
     }
 
+    const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space)
+
+    if (spaceJustPressed && this.isTouchingGround === true) {
+      this.penguin.setVelocityY(-12);
+      this.isTouchingGround = false;
+      // this.penguin.flipX = false;
+    }
+
+    // else if (cursors.up.isDown) {
+
+    //   this.penguin.setVelocityY(-6);
+    //   this.penguin.flipX = false;
+    //   this.penguin.anims.play('jump', true);
+    //   // this.penguin.anims.play('walk', true);
+    // }
     // const spaceJustPressed = Phaser.Input.keyboard.
 
     // if (cursors.up.isDown && this.penguin.body.touching.down) {

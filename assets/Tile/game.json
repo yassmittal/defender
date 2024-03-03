@@ -27,9 +27,53 @@
          "width":50,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":2,
+         "name":"objects",
+         "objects":[
+                {
+                 "height":69.6666666666666,
+                 "id":4,
+                 "name":"penguin-spawn",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":69.6666666666667,
+                 "x":420.333333333333,
+                 "y":490
+                }, 
+                {
+                 "height":70,
+                 "id":6,
+                 "name":"coin",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":70.6666666666666,
+                 "x":210,
+                 "y":349.333333333333
+                }, 
+                {
+                 "height":68.6666666666666,
+                 "id":7,
+                 "name":"coin",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":71.3333333333333,
+                 "x":210,
+                 "y":490.666666666667
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":2,
- "nextobjectid":1,
+ "nextlayerid":3,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
