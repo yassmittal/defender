@@ -18,6 +18,7 @@ class Game extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.isTouchingGround = false;
+    this.coin;
 
     const map = this.make.tilemap({
       key: "tilemap"
@@ -184,35 +185,29 @@ class Game extends Phaser.Scene {
             })
 
             this.cameras.main.startFollow(this.penguin)
-
             break;
           }
 
         case "coin": {
           this.coin = this.matter.add.sprite(x + width / 2, y + height / 2, "coin")
-            .setStatic(true);
+            .setStatic(true)
+            .anims.play('rotate-coin', true)
+            .isSensor(true)
 
-          this.coin.anims.play('rotate-coin', true);
-
-          this.matter.world.on("collisionstart", (event, bodyA, bodyB) => {
-            if ((bodyA.label == this.coin && bodyB.label == this.penguin) || (bodyB.label == this.coin && bodyA.label == this.penguin)) {
-              console.log('hitted')
-            }
-
-            // console.log('hitted')
+          this.matter.world.on('collisionstart', (event) => {
+            console.log(event.pairs)
+            event.pairs.forEach(pair => {
+              const { bodyA, bodyB } = pair;
+              if ((bodyA === this.penguin.body && bodyB === this.coin.body) ||
+                (bodyA === this.coin.body && bodyB === this.penguin.body)) {
+                this.coin.destroy();
+              }
+            });
           });
-
-
-          // this.coin.setOnCollide(() => {
-          //   console.log('hi coin hit')
-          //   this.coin.destroy(true)
-          // })
-
 
         }
       }
 
-      console.log(objData)
     })
 
 
